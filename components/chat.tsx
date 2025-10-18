@@ -25,6 +25,7 @@ import { ChatSDKError } from "@/lib/errors";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
 import { fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
+import { getPersonalization } from "@/lib/personalize";
 import { Artifact } from "./artifact";
 import { useDataStream } from "./data-stream-provider";
 import { Messages } from "./messages";
@@ -85,15 +86,24 @@ export function Chat({
       api: "/api/chat",
       fetch: fetchWithErrorHandlers,
       prepareSendMessagesRequest(request) {
-        return {
-          body: {
+          const body = {
             id: request.id,
             message: request.messages.at(-1),
             selectedChatModel: currentModelIdRef.current,
             selectedVisibilityType: visibilityType,
+            personalization: getPersonalization(),
             ...request.body,
-          },
-        };
+          };
+
+          try {
+            // debug log outgoing request body
+            // eslint-disable-next-line no-console
+            console.debug("[chat] prepareSendMessagesRequest body:", body);
+          } catch (e) {
+            /* ignore */
+          }
+
+          return { body };
       },
     }),
     onData: (dataPart) => {

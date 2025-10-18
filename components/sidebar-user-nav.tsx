@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PersonalizeChat from "./personalize-chat";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -28,11 +41,22 @@ export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, resolvedTheme } = useTheme();
 
   const isGuest = guestRegex.test(data?.user?.email ?? "");
+  const [personalizeOpen, setPersonalizeOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const openTimeoutRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (openTimeoutRef.current) {
+        clearTimeout(openTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             {status === "loading" ? (
               <SidebarMenuButton className="h-10 justify-between bg-background data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
@@ -65,11 +89,30 @@ export function SidebarUserNav({ user }: { user: User }) {
               </SidebarMenuButton>
             )}
           </DropdownMenuTrigger>
-          <DropdownMenuContent
+            <DropdownMenuContent
             className="w-(--radix-popper-anchor-width)"
             data-testid="user-nav-menu"
             side="top"
           >
+            {/* Personalize Chat dialog trigger and content (opens overlay) */}
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-testid="user-nav-item-personalize"
+              onSelect={() => {
+                // Close dropdown first, then open personalize dialog.
+                setDropdownOpen(false);
+                if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+                openTimeoutRef.current = window.setTimeout(() => {
+                  setPersonalizeOpen(true);
+                  openTimeoutRef.current = null;
+                }, 120);
+              }}
+            >
+              Personalize chat
+            </DropdownMenuItem>
+
+            {/* AlertDialog is rendered outside the dropdown so it doesn't get unmounted when the menu closes */}
+
             <DropdownMenuItem
               className="cursor-pointer"
               data-testid="user-nav-item-theme"
@@ -109,6 +152,11 @@ export function SidebarUserNav({ user }: { user: User }) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <PersonalizeChat
+          open={personalizeOpen}
+          onOpenChange={setPersonalizeOpen}
+          initialText={""}
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   );

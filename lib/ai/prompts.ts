@@ -112,3 +112,19 @@ export const updateDocumentPrompt = (
 
 ${currentContent}`;
 };
+
+/**
+ * Prepend personalization as a system message so it cannot be overridden by
+ * the user's prompt. Returns a new messages array.
+ */
+export function buildMessagesWithPersonalization(
+  messages: Array<{ role: string; content: string }>,
+  personalization?: string | null
+) {
+  const result = [...messages];
+  if (personalization && personalization.trim().length > 0) {
+    // system role should be respected by models as highest-level instruction
+    result.unshift({ role: "system", content: personalization });
+  }
+  return result;
+}

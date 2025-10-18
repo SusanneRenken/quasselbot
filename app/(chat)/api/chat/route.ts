@@ -85,6 +85,10 @@ export async function POST(request: Request) {
   try {
     const json = await request.json();
     requestBody = postRequestBodySchema.parse(json);
+
+    // Debug: log incoming personalization
+    // eslint-disable-next-line no-console
+    console.log("[chat API] received personalization:", requestBody.personalization);
   } catch (_) {
     return new ChatSDKError("bad_request:api").toResponse();
   }
@@ -173,6 +177,23 @@ export async function POST(request: Request) {
       createdAt: new Date(m.createdAt),
     }));
     const uiMessages = [...convertToUIMessages(normalizedMessages), message];
+
+    // Debug: log first few uiMessages
+    // eslint-disable-next-line no-console
+    console.log(
+      "[chat API] uiMessages head:",
+      uiMessages.slice(0, 3).map((m) => ({ role: m.role, parts: m.parts?.slice(0, 1) }))
+    );
+
+    // If the client sent a personalization string, insert it as a system message
+    // at the front so models treat it as high-priority instructions.
+    if (requestBody.personalization && requestBody.personalization.trim()) {
+      uiMessages.unshift({
+        id: "personalization",
+        role: "system",
+        parts: [{ type: "text", text: requestBody.personalization }],
+      } as any);
+    }
 
     const { longitude, latitude, city, country } = geolocation(request);
 
