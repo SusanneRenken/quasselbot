@@ -1,0 +1,10 @@
+{
+  "products": [
+    {
+      "type": "integration",
+      "protocol": "storage",
+      "productSlug": "upstash-kv",
+      "integrationSlug": "upstash"
+    }
+  ]
+}
