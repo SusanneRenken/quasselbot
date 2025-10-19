@@ -24,10 +24,10 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
-  const openAuthPaths = ["/login", "/register", "/login/form"];
+  const openAuthPaths = ["/login", "/register", "/login/form", "/"];
 
   if (!token) {
-    // Allow unauthenticated users to view auth pages without forced guest provisioning.
+    // Allow unauthenticated users to view auth pages and the landing page without forced guest provisioning.
     if (openAuthPaths.includes(pathname)) {
       return NextResponse.next();
     }
