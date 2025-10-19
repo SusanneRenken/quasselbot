@@ -10,12 +10,22 @@ export default function LandingFooter() {
         <div className="text-sm">© {year} — QuasselBot</div>
 
         <div className="flex items-center gap-3">
-          <button className="text-sm text-muted-foreground" disabled>
+          <a
+            href="/impressum"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+          >
             Impressum
-          </button>
-          <button className="text-sm text-muted-foreground" disabled>
+          </a>
+          <a
+            href="/datenschutz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+          >
             Datenschutz
-          </button>
+          </a>
         </div>
 
         <div>

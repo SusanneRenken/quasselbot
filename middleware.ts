@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
-  const openAuthPaths = ["/login", "/register", "/login/form", "/"];
+  const openAuthPaths = ["/login", "/register", "/login/form", "/", "/impressum", "/datenschutz"];
 
   if (!token) {
     // Allow unauthenticated users to view auth pages and the landing page without forced guest provisioning.
@@ -57,6 +57,8 @@ export const config = {
   matcher: [
     "/",
     "/chat/:id",
+  "/impressum",
+  "/datenschutz",
     "/api/:path*",
     "/login",
     "/register",
